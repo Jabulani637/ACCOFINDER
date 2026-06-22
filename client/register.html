@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - ACCOFINDER</title>
+  <link rel="stylesheet" href="stylesheet.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="brand-badge">A</div>
+          <div>
+            <div style="font-size:14px; line-height:1.1;">ACCOFINDER</div>
+            <div style="font-size:12px; color:var(--muted); font-weight:700;">Accommodation System</div>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="title">Create an account</h1>
+      <p class="subtitle">Create your account in just a few steps.</p>
+
+      <!--
+        NOTE:
+        - Hook up your backend endpoint via form action/method.
+        - Current action points to /register (adjust to match your server).
+      -->
+      <form id="registerForm" action="/register" method="POST" autocomplete="on">
+        <div class="row-2">
+          <div class="field">
+            <label for="firstName">First name</label>
+            <input id="firstName" name="firstName" type="text" placeholder="First name" required />
+          </div>
+          <div class="field">
+            <label for="lastName">Last name</label>
+            <input id="lastName" name="lastName" type="text" placeholder="Last name" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Mobile number or email</label>
+          <input id="email" name="email" type="email" placeholder="Email address" required />
+        </div>
+
+        <div class="field">
+          <label for="password">New password</label>
+          <input id="password" name="password" type="password" placeholder="New password" required minlength="6" />
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm password</label>
+          <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" required minlength="6" />
+          <div class="hint" id="passwordHint" style="display:none;">
+            Passwords do not match.
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="role">I am registering as</label>
+            <select id="role" name="role" required>
+              <option value="student" selected>Student</option>
+              <option value="owner">Property Owner</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="unspecified" selected>Prefer not to say</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="city">Preferred city</label>
+            <select id="city" name="city" required>
+              <option value="" selected disabled>Select city</option>
+              <option value="">—</option>
+              <option value="Kandy">Kandy</option>
+              <option value="Colombo">Colombo</option>
+              <option value="Galle">Galle</option>
+              <option value="Jaffna">Jaffna</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" placeholder="Phone number" required />
+          </div>
+        </div>
+
+
+
+        <button class="primary-btn" type="submit">Sign up</button>
+
+        <div class="notice">
+          By signing up, you agree to our terms and that your details are used to match you with available accommodations.
+        </div>
+
+        <div class="links">
+          <a class="link" href="login.html">Already have an account?</a>
+          <a class="link" href="home.html">Back to Home</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Lightweight UX: validate email + password confirmation.
+    const form = document.getElementById('registerForm');
+    const emailEl = document.getElementById('email');
+    const passwordEl = document.getElementById('password');
+    const confirmPasswordEl = document.getElementById('confirmPassword');
+    const hintEl = document.getElementById('passwordHint');
+
+    const checkPasswords = () => {
+      if (!passwordEl || !confirmPasswordEl || !hintEl) return true;
+      const ok = passwordEl.value === confirmPasswordEl.value;
+      hintEl.style.display = ok ? 'none' : 'block';
+      return ok;
+    };
+
+    passwordEl?.addEventListener('input', checkPasswords);
+    confirmPasswordEl?.addEventListener('input', checkPasswords);
+
+    form?.addEventListener('submit', (e) => {
+      if (emailEl && !emailEl.value) {
+        e.preventDefault();
+        emailEl.focus();
+        return;
+      }
+      if (!checkPasswords()) {
+        e.preventDefault();
+        confirmPasswordEl?.focus();
+      }
+    });
+  </script>
+</body>
+</html>
+

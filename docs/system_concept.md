@@ -21,7 +21,53 @@ To create a safe, consolidated, data-driven ecosystem that empowers students to:
 
 ---
 
-## 2. Platform User Roles (Actors)
+## 2. Core Strategic Pillars
+
+### The Core Insight: Trust Infrastructure
+Accofinder is not just a listing site; it is a **trust infrastructure**. Every interaction—from the initial search query to final move-out—leaves a secure data trail that protects both tenants and landlords, generating data that makes the platform smarter over time.
+
+### The Three Engines
+1. **Verified Identity Layer:** Landlords undergo property verification, and tenants undergo student verification (via academic email domain check or enrollment certificate uploads). This mechanism eliminates the majority of listing and deposit scams prevalent on WhatsApp and Facebook.
+2. **Data-Driven Matching Engine:** Fuses location (distance to campus, transport routes), budget constraint parameters, lifestyle preferences (study hours, cleanliness), and historic reviews. As usage increases, recommendations continuously optimize.
+3. **The Trust Graph:** Mutual reviews build social accountability. Tenants rate landlords on responsiveness and property upkeep; landlords rate tenants on cleanliness and payment history. Landlords who neglect maintenance or tenants who damage property see their ratings dynamically degrade.
+
+---
+
+## 3. Implementation Roadmap (Prioritization)
+
+We prioritize building the core loop first to capture value, then expand:
+
+```
+[Phase 1: Discovery & Listings] ──> [Phase 2: Application & Leasing] ──> [Phase 3: Stay Management] ──> [Phase 4: Social & Bursaries]
+      (The Acquisition Hook)                (The Transaction Engine)               (The Retention Loop)            (The Scaling Multiplier)
+```
+
+1. **Discovery + Listings (Acquisition Hook):** Launch interactive map search, listing uploads, and verified badge checks to attract users.
+2. **Application + Leasing (Transaction Engine):** Build the application submission funnel, status pipeline tracking, and digital lease signing.
+3. **Stay Management (Retention Loop):** Implement tenant maintenance ticket submission, service provider routing, and rent invoice tracking.
+4. **Social Community & Bursaries (Scale & Integration):** Introduce group chats, roommate matchmaking feeds, and bursary funding APIs once the core transaction loop is validated.
+
+---
+
+## 4. Strategic Questions & Design Decisions
+
+To make the system fully successful, we must collaborate on three pivotal questions:
+
+> [!IMPORTANT]
+> **1. Primary Geography:** Are we launching in a single city/country first, or multi-region from day one?
+> * *Impact:* Verification systems (different academic registries), currency systems, lease regulations, and address validation engines vary significantly across borders.
+
+> [!IMPORTANT]
+> **2. Monetization Model:** How should we structure revenue generation?
+> * *Options:* Landlord subscriptions, commission per signed lease transaction, premium features (such as priority listings), or sponsor/bursary partnership fees.
+
+> [!IMPORTANT]
+> **3. Platform Strategy:** Should we target a mobile-first Progressive Web App (PWA) or build native mobile apps alongside the web portal?
+> * *Impact:* Affects real-time messaging latency, offline document signing support, push notification reliability for maintenance tickets, and development speed.
+
+---
+
+## 5. Platform User Roles (Actors)
 
 Accofinder serves a multi-tenant ecosystem containing five primary actors:
 
@@ -36,7 +82,7 @@ Accofinder serves a multi-tenant ecosystem containing five primary actors:
 
 ---
 
-## 3. The Core Experience: Social Network Meets Airbnb
+## 6. The Core Experience: Social Network Meets Airbnb
 
 Accofinder uniquely fuses structural booking tools with social interactions.
 
@@ -61,7 +107,7 @@ graph TD
 
 ---
 
-## 4. Key Workflows
+## 7. Key Workflows
 
 ### 1. Application & Stay Lifecycle
 1. **Explore:** Students filter verified listings based on proximity parameters.
