@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AccoFinder – Find verified student accommodation near your campus in South Africa.">
+<title>AccoFinder – Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" />
+<link rel="stylesheet" href="home.css">
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Top Nav ──────────────────────────────────────────────── -->
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <div class="brand">
+        <span class="brand-name" style="color: var(--fb-blue); font-size: 20px;">AccoFinder</span>
+      </div>
+      <div class="nav-icons">
+        <span class="nav-greeting">Welcome <strong id="userGreeting"></strong></span>
+        <button class="icon-btn" id="searchNavBtn" aria-label="Search">
+          <span class="material-symbols-rounded">search</span>
+        </button>
+        <!-- Notifications button removed per request -->
+        <button id="logoutBtn" class="icon-btn" aria-label="Log out" title="Log out">
+          <span class="material-symbols-rounded">logout</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true" data-panel="home" type="button">
+        <span class="material-symbols-rounded">home</span>
+        Home
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="profile" type="button">
+        <span class="material-symbols-rounded">person</span>
+        Profile
+      </button>
+      <a class="tab" role="tab" aria-selected="false" href="noticeboard.html" style="text-decoration:none;">
+        <div class="tab-notif">
+          <span class="material-symbols-rounded">notifications</span>
+          <span class="tab-dot">3</span>
+        </div>
+        Noticeboard
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Feed Layout ───────────────────────────────────────────── -->
+  <main class="feed">
+    <div class="feed-layout">
+      <div class="feed-main">
+
+        <!-- ── HOME PANEL ─────────────────────────────────────── -->
+        <div id="panelHome">
+
+          <!-- Filter strip -->
+          <div class="filter-strip">
+            <button class="filter-pill active" data-category="all">All</button>
+            <button class="filter-pill" data-category="near-campus">Near Campus</button>
+            <button class="filter-pill" data-category="rooms">Rooms</button>
+            <button class="filter-pill" data-category="flats">Flats</button>
+            <button class="filter-pill" data-category="houses">Houses</button>
+            <button class="filter-pill" data-category="verified">Verified</button>
+          </div>
+
+          <!-- Create / Report bar -->
+          <div class="create-bar">
+            <div class="create-bar-top">
+              <div id="userAvatar" class="avatar-sm"></div>
+              <button class="create-input" id="createPostBtn">
+                Report an issue or ask a question…
+              </button>
+            </div>
+            <div class="create-actions">
+              <button class="create-action-btn photo-btn">
+                <span class="material-symbols-rounded">location_on</span>
+                Photo
+              </button>
+              <button class="create-action-btn video-btn">
+                <span class="material-symbols-rounded">bed</span>
+                Video tour
+              </button>
+              <button class="create-action-btn report-btn">
+                <span class="material-symbols-rounded">apartment</span>
+                Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Section header -->
+          <div class="section-hdr">
+            <h2>Near Your Campus</h2>
+            <button class="see-all" id="seeAllBtn">See all</button>
+          </div>
+
+          <!-- Dynamic cards rendered by home.js -->
+          <div id="feedCards"></div>
+
+        </div><!-- /panelHome -->
+
+        <!-- ── PROFILE PANEL ───────────────────────────────────── -->
+        <div id="panelProfile" style="display:none;">
+          <div class="profile-panel">
+            <div class="profile-hero">
+              <div class="profile-avatar-lg" id="profileInitials"></div>
+              <h2 class="profile-display-name" id="profileName"></h2>
+              <p class="profile-email-text" id="profileEmail"></p>
+              <span class="profile-role-badge" id="profileRole"></span>
+            </div>
+
+            <div class="profile-info-card">
+              <div class="profile-info-row">
+                <span class="material-symbols-rounded">mail</span>
+                <div>
+                  <div class="pinfo-label">Preferred City</div>
+                  <div class="pinfo-value" id="profileCity"></div>
+                </div>
+              </div>
+              <div class="profile-info-row">
+                <span class="material-symbols-rounded">location_city</span>
+                <div>
+                  <div class="pinfo-label">Account Type</div>
+                  <div class="pinfo-value" id="profileRole2"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="profile-action-btn" id="viewSavedBtn">
+                <span class="material-symbols-rounded">bookmark</span>
+                Saved Listings
+              </button>
+              <button class="profile-action-btn" id="viewApplicationsBtn">
+                <span class="material-symbols-rounded">description</span>
+                My Applications
+              </button>
+              <button class="profile-action-btn danger-btn" id="profileLogoutBtn">
+                <span class="material-symbols-rounded">logout</span>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div><!-- /panelProfile -->
+
+        <!-- (legacy alerts panel removed; Alerts now opens noticeboard.html) -->
+
+          <div class="alerts-panel">
+            <div class="section-hdr">
+              <h2>Notifications</h2>
+              <button class="see-all" id="markAllReadBtn">Mark all read</button>
+            </div>
+            <div class="alerts-list">
+              <div class="alert-item unread">
+                <div class="alert-dot"></div>
+                <div class="alert-icon" style="background:var(--teal-light);">
+                  <span class="material-symbols-rounded" style="color:var(--teal);">verified</span>
+                </div>
+                <div class="alert-body">
+                  <div class="alert-title">McIntyre Property verified</div>
+                  <div class="alert-sub">The listing at Braamfontein has been verified by our team.</div>
+                  <div class="alert-time">2 hours ago</div>
+                </div>
+              </div>
+              <div class="alert-item unread">
+                <div class="alert-dot"></div>
+                <div class="alert-icon" style="background:var(--fb-blue-light);">
+                  <span class="material-symbols-rounded" style="color:var(--fb-blue);">new_releases</span>
+                </div>
+                <div class="alert-body">
+                  <div class="alert-title">Application received</div>
+                  <div class="alert-sub">Sophiatown Residence received your application and will respond within 48 hours.</div>
+                  <div class="alert-time">Yesterday</div>
+                </div>
+              </div>
+              <div class="alert-item unread">
+                <div class="alert-dot"></div>
+                <div class="alert-icon" style="background:#FFF3E0;">
+                  <span class="material-symbols-rounded" style="color:var(--amber);">star</span>
+                </div>
+                <div class="alert-body">
+                  <div class="alert-title">New listing near you</div>
+                  <div class="alert-sub">Parktown Heights was just listed 0.5 km from Wits. Only 2 units remaining!</div>
+                  <div class="alert-time">2 days ago</div>
+                </div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon" style="background:#F3E8FF;">
+                  <span class="material-symbols-rounded" style="color:#7C3AED;">campaign</span>
+                </div>
+                <div class="alert-body">
+                  <div class="alert-title">Welcome to AccoFinder!</div>
+                  <div class="alert-sub">Start browsing verified student accommodation near your campus today.</div>
+                  <div class="alert-time">When you joined</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /panelAlerts -->
+
+        <!-- ── SIDEBAR (Map + Nearby) ─────────────────────────── -->
+        <aside class="sidebar-right" id="panelSidebar">
+          <!-- Map Card -->
+          <div class="map-card">
+            <div class="map-preview">
+              <div class="map-grid"></div>
+              <div class="map-dots">
+                <div class="map-dot" style="background:var(--fb-blue);"></div>
+                <div class="map-dot" style="background:var(--teal);"></div>
+                <div class="map-dot" style="background:var(--coral);"></div>
+              </div>
+              <div class="map-pin">
+                <span class="material-symbols-rounded" style="font-size: 48px;">location_on</span>
+                <span class="map-pin-label">34 near you</span>
+              </div>
+            </div>
+            <div class="map-info-row">
+              <div>
+                <div class="map-label">Explore on Map</div>
+                <div class="map-sub">Braamfontein, Melville, Parktown</div>
+              </div>
+              <button class="explore-btn" id="exploreMapBtn">Explore</button>
+            </div>
+          </div>
+
+          <!-- Nearby Section -->
+          <div class="section-hdr">
+            <h2>Also Nearby</h2>
+            <button class="see-all">See all</button>
+          </div>
+          <div class="nearby-strip">
+            <div class="nearby-card">
+              <div class="nearby-thumb" style="background:var(--teal-light);">🏠</div>
+              <div class="nearby-info">
+                <div class="nearby-name">Sophiatown Residence</div>
+                <div class="nearby-price">R2 800/mo</div>
+                <div class="nearby-dist">1.2 km · Verified</div>
+              </div>
+            </div>
+            <div class="nearby-card">
+              <div class="nearby-thumb" style="background:var(--fb-blue-light);">🏗</div>
+              <div class="nearby-info">
+                <div class="nearby-name">Parktown Heights</div>
+                <div class="nearby-price">R4 200/mo</div>
+                <div class="nearby-dist">0.5 km · Verified</div>
+              </div>
+            </div>
+            <div class="nearby-card">
+              <div class="nearby-thumb" style="background:#FFF3E0;">🏘</div>
+              <div class="nearby-info">
+                <div class="nearby-name">Melville Student House</div>
+                <div class="nearby-price">R1 900/mo</div>
+                <div class="nearby-dist">2.1 km</div>
+              </div>
+            </div>
+            <div class="nearby-card">
+              <div class="nearby-thumb" style="background:#F3E8FF;">🏛</div>
+              <div class="nearby-info">
+                <div class="nearby-name">Newtown Flat</div>
+                <div class="nearby-price">R3 100/mo</div>
+                <div class="nearby-dist">1.8 km · Verified</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div><!-- /feed-main -->
+    </div><!-- /feed-layout -->
+  </main>
+
+</div><!-- /shell -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════════════════ -->
+
+<!-- Apply Modal -->
+<div class="modal-overlay" id="applyModal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="applyModalTitle">Apply for Accommodation</h2>
+        <p class="modal-sub" id="applyModalSub"></p>
+      </div>
+      <button class="modal-close" data-close-modal="applyModal" aria-label="Close">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <form id="applyForm">
+      <input type="hidden" id="applyListingId">
+      <div class="modal-field">
+        <label for="applyName">Full Name</label>
+        <input type="text" id="applyName" placeholder="Your full name" required>
+      </div>
+      <div class="modal-field">
+        <label for="applyEmail">Email Address</label>
+        <input type="email" id="applyEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="modal-field">
+        <label for="applyPhone">Phone Number</label>
+        <input type="tel" id="applyPhone" placeholder="e.g. 082 123 4567">
+      </div>
+      <div class="modal-field">
+        <label for="applyMessage">Message to Landlord</label>
+        <textarea id="applyMessage" placeholder="Tell the landlord about yourself — your course, move-in date, etc." rows="4"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn-ghost" data-close-modal="applyModal">Cancel</button>
+        <button type="submit" class="modal-btn-primary">Submit Application</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal-overlay" id="viewModal" role="dialog" aria-modal="true" aria-labelledby="viewModalName">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title" id="viewModalName">Listing Detail</h2>
+      <button class="modal-close" data-close-modal="viewModal" aria-label="Close">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div class="modal-body" id="viewModalBody"></div>
+    <div class="modal-footer">
+      <button type="button" class="modal-btn-ghost" data-close-modal="viewModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Post / Report Modal -->
+<div class="modal-overlay" id="postModal" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="postModalTitle">Post an Issue or Question</h2>
+        <p class="modal-sub">Share concerns or ask the AccoFinder community.</p>
+      </div>
+      <button class="modal-close" data-close-modal="postModal" aria-label="Close">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <form id="postForm">
+      <div class="modal-field">
+        <label for="postCategory">Category</label>
+        <select id="postCategory">
+          <option value="question">Question</option>
+          <option value="report">Report an Issue</option>
+          <option value="review">Leave a Review</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="postContent">Your Message</label>
+        <textarea id="postContent" placeholder="Describe your issue or question in detail…" rows="5" required></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn-ghost" data-close-modal="postModal">Cancel</button>
+        <button type="submit" class="modal-btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="scripts/auth.js"></script>
+<script src="scripts/modal.js"></script>
+<script src="scripts/listings.js"></script>
+<script src="scripts/home.js"></script>
+</body>
+</html>

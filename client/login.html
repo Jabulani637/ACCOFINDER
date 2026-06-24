@@ -3,18 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - ACCOFINDER</title>
+  <meta name="description" content="Log in to your AccoFinder account to browse verified student accommodation." />
+  <title>Log In – AccoFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" />
   <link rel="stylesheet" href="stylesheet.css" />
 </head>
 <body>
   <div class="auth-page">
     <div class="auth-card">
+
+      <!-- Brand -->
       <div class="brand-row">
         <div class="brand">
           <div class="brand-badge">A</div>
           <div>
-            <div style="font-size:14px; line-height:1.1;">ACCOFINDER</div>
-            <div style="font-size:12px; color:var(--muted); font-weight:700;">Accommodation System</div>
+            <div class="brand-title">ACCOFINDER</div>
+            <div class="brand-sub">Accommodation System</div>
           </div>
         </div>
       </div>
@@ -22,14 +29,15 @@
       <h1 class="title">Log in</h1>
       <p class="subtitle">Welcome back. Sign in to continue.</p>
 
-      <!--
-        NOTE:
-        - Hook up your backend endpoint via form action/method.
-        - Current action points to /login (adjust to match your server).
-      -->
-      <form id="loginForm" action="/login" method="POST" autocomplete="on">
+      <!-- Success Banner (shown after password reset) -->
+      <div id="successBanner" class="success-banner" style="display:none;"></div>
+
+      <!-- Error Banner -->
+      <div id="errorBanner" class="error-banner" style="display:none;"></div>
+
+      <form id="loginForm" autocomplete="on">
         <div class="field">
-          <label for="email">Mobile number or email</label>
+          <label for="email">Email address</label>
           <input id="email" name="email" type="email" placeholder="Email address" required />
         </div>
 
@@ -38,20 +46,31 @@
           <input id="password" name="password" type="password" placeholder="Password" required minlength="6" />
         </div>
 
-        <button class="primary-btn" type="submit">Log in</button>
-
-        <div class="notice">
-          Don’t have an account?
+        <div class="forgot-row">
+          <a class="link-muted" href="forgot-password.html">Forgot password?</a>
         </div>
 
+        <button id="submitBtn" class="primary-btn" type="submit">Log in</button>
+
+        <div class="notice">Don't have an account yet?</div>
+
         <div class="links">
-          <a class="link" href="register.html">Create account</a>
+          <a class="link" href="register.html">Create a free account <strong>→</strong></a>
         </div>
       </form>
     </div>
   </div>
 
+  <script src="scripts/auth.js"></script>
   <script src="scripts/login.js"></script>
+  <script>
+    // Show success banner if redirected from password reset
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reset') === '1') {
+      const b = document.getElementById('successBanner');
+      if (b) { b.textContent = '✓ Password reset successfully. You can now log in with your new password.'; b.style.display = 'block'; }
+      history.replaceState(null, '', 'login.html');
+    }
+  </script>
 </body>
 </html>
-

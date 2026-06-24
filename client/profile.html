@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AccoFinder – Your profile and saved listings.">
+  <title>AccoFinder – Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" />
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Top Nav ──────────────────────────────────────────────── -->
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <div class="brand">
+        <span class="brand-name" style="color: var(--fb-blue); font-size: 20px;">AccoFinder</span>
+      </div>
+      <div class="nav-icons">
+        <span class="nav-greeting">Welcome <strong id="userGreeting"></strong></span>
+        <button class="icon-btn" id="searchNavBtn" aria-label="Search" title="Search">
+          <span class="material-symbols-rounded">search</span>
+        </button>
+        <button id="logoutBtn" class="icon-btn" aria-label="Log out" title="Log out">
+          <span class="material-symbols-rounded">logout</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" role="tablist">
+      <a class="tab" role="tab" aria-selected="false" href="home.html" data-panel="home" style="text-decoration:none;">
+        <span class="material-symbols-rounded">home</span>
+        Home
+      </a>
+      <a class="tab active" role="tab" aria-selected="true" href="profile.html" data-panel="profile" style="text-decoration:none;">
+        <span class="material-symbols-rounded">person</span>
+        Profile
+      </a>
+      <a class="tab" role="tab" aria-selected="false" href="noticeboard.html" style="text-decoration:none;">
+        <span class="material-symbols-rounded">notifications</span>
+        Noticeboard
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Feed Layout ───────────────────────────────────────────── -->
+  <main class="feed">
+    <div class="feed-layout">
+      <div class="feed-main">
+
+        <div id="panelProfile" class="panelProfile">
+          <div class="profile-panel">
+            <div class="profile-hero">
+              <div class="profile-avatar-lg" id="profileInitials"></div>
+              <h2 class="profile-display-name" id="profileName"></h2>
+              <p class="profile-email-text" id="profileEmail"></p>
+              <span class="profile-role-badge" id="profileRole"></span>
+            </div>
+
+            <div class="profile-info-card">
+              <div class="profile-info-row">
+                <span class="material-symbols-rounded">mail</span>
+                <div>
+                  <div class="pinfo-label">Preferred City</div>
+                  <div class="pinfo-value" id="profileCity"></div>
+                </div>
+              </div>
+              <div class="profile-info-row">
+                <span class="material-symbols-rounded">location_city</span>
+                <div>
+                  <div class="pinfo-label">Account Type</div>
+                  <div class="pinfo-value" id="profileRole2"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="profile-action-btn" id="viewSavedBtn">
+                <span class="material-symbols-rounded">bookmark</span>
+                Saved Listings
+              </button>
+              <button class="profile-action-btn" id="viewApplicationsBtn">
+                <span class="material-symbols-rounded">description</span>
+                My Applications
+              </button>
+              <button class="profile-action-btn danger-btn" id="profileLogoutBtn">
+                <span class="material-symbols-rounded">logout</span>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script src="scripts/auth.js"></script>
+<script src="scripts/profile.js"></script>
+</body>
+</html>
+

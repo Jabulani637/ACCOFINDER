@@ -1,0 +1,10 @@
+{
+  "public": "client",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/home.html"
+    }
+  ]
+}
+
