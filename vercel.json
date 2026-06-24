@@ -1,10 +1,8 @@
 {
-  "public": "client",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "client",
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/home.html"
-    }
+    { "source": "/", "destination": "/home.html" }
   ]
 }
 
