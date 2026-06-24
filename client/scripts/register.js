@@ -22,7 +22,7 @@
     submitBtn.textContent = "Creating account...";
 
     try {
-      const res  = await fetch(`${API_URL}/auth/register`, {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -42,10 +42,10 @@
       saveSession(data);
       window.location.href = "home.html";
     } catch {
-      showError("Could not connect to server.");
+      showError("Could not connect to server. Is the backend running?");
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Sign up";
+      submitBtn.textContent = "Create Account";
     }
   });
 })();

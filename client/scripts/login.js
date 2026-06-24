@@ -24,10 +24,10 @@
       if (!res.ok) return showError(data.detail || "Login failed.");
 
       saveSession(data);
-      const role = data.user.role;
-      window.location.href = role === "admin" ? "admin.html" : role === "owner" ? "dashboard.html" : "home.html";
+      window.location.href = "home.html";
+
     } catch {
-      showError("Could not connect to server.");
+      showError("Could not connect to server. Is the backend running?");
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Log in";
