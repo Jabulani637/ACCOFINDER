@@ -1,67 +1,51 @@
-/**
- * register.js – handles sign-up form, stores user in localStorage,
- *               then redirects to login.html
- */
+(() => {
+  const form        = document.getElementById("registerForm");
+  const passEl      = document.getElementById("password");
+  const confirmEl   = document.getElementById("confirmPassword");
+  const hintEl      = document.getElementById("passwordHint");
+  const errorBanner = document.getElementById("errorBanner");
+  const submitBtn   = document.getElementById("submitBtn");
 
-// Redirect to home if already logged in
-requireGuest();
+  function showError(msg) { if (errorBanner) { errorBanner.textContent = msg; errorBanner.style.display = "block"; } }
+  function hideError()    { if (errorBanner) errorBanner.style.display = "none"; }
+  const checkPasswords = () => { const ok = passEl.value === confirmEl.value; if (hintEl) hintEl.style.display = ok ? "none" : "block"; return ok; };
 
-const form               = document.getElementById('registerForm');
-const passwordEl         = document.getElementById('password');
-const confirmPasswordEl  = document.getElementById('confirmPassword');
-const passwordHint       = document.getElementById('passwordHint');
-const submitBtn          = document.getElementById('submitBtn');
-const errorBanner        = document.getElementById('errorBanner');
+  passEl?.addEventListener("input", checkPasswords);
+  confirmEl?.addEventListener("input", checkPasswords);
 
-/* ── Live password-match check ──────────────────────────────── */
-function checkPasswords() {
-  const ok = passwordEl.value === confirmPasswordEl.value;
-  passwordHint.style.display = ok ? 'none' : 'block';
-  return ok;
-}
-passwordEl?.addEventListener('input', checkPasswords);
-confirmPasswordEl?.addEventListener('input', checkPasswords);
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+    if (!checkPasswords()) return confirmEl.focus();
 
-/* ── Form submit ────────────────────────────────────────────── */
-form?.addEventListener('submit', (e) => {
-  e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating account...";
 
-  if (!checkPasswords()) {
-    confirmPasswordEl.focus();
-    return;
-  }
+    try {
+      const res  = await fetch(`${API_URL}/auth/register`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: document.getElementById("firstName").value.trim(),
+          last_name:  document.getElementById("lastName").value.trim(),
+          email:      document.getElementById("email").value.trim(),
+          password:   passEl.value,
+          phone:      document.getElementById("phone").value.trim(),
+          role:       document.getElementById("role").value,
+          gender:     document.getElementById("gender").value,
+          city:       document.getElementById("city").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) return showError(data.detail || "Registration failed.");
 
-  const email     = document.getElementById('email').value.trim().toLowerCase();
-  const firstName = document.getElementById('firstName').value.trim();
-  const lastName  = document.getElementById('lastName').value.trim();
-  const role      = document.getElementById('role').value;
-  const gender    = document.getElementById('gender').value;
-  const city      = document.getElementById('city').value;
-  const phone     = document.getElementById('phone').value.trim();
-  const password  = passwordEl.value;
-
-  // Check if email already registered
-  const existing = JSON.parse(localStorage.getItem('accofinder_accounts') || '[]');
-  if (existing.find(u => u.email === email)) {
-    showError('An account with this email already exists. Please log in.');
-    return;
-  }
-
-  // Save the new account
-  const user = { firstName, lastName, email, password, role, gender, city, phone };
-  existing.push(user);
-  localStorage.setItem('accofinder_accounts', JSON.stringify(existing));
-
-  // Show success state then redirect to login
-  submitBtn.textContent = 'Account created! Redirecting…';
-  submitBtn.disabled = true;
-  setTimeout(() => {
-    window.location.href = 'login.html';
-  }, 1000);
-});
-
-function showError(msg) {
-  errorBanner.textContent = msg;
-  errorBanner.style.display = 'block';
-  setTimeout(() => { errorBanner.style.display = 'none'; }, 4000);
-}
+      saveSession(data);
+      window.location.href = "home.html";
+    } catch {
+      showError("Could not connect to server.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Sign up";
+    }
+  });
+})();

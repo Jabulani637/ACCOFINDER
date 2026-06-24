@@ -1,224 +1,106 @@
-/**
- * forgot-password.js
- *
- * Two-step password reset flow (localStorage-based):
- *  Step 1 – Verify email exists in accofinder_accounts[]
- *  Step 2 – Set a new password, update the account record, redirect to login
- */
+(() => {
+  let selectedChannel = "email";
+  let userEmail       = "";
+  let verifiedCode    = "";
 
-/* Redirect to home if already logged in */
-requireGuest();
+  const errorBanner   = document.getElementById("errorBanner");
+  const successBanner = document.getElementById("successBanner");
+  const dots = [document.getElementById("dot1"), document.getElementById("dot2"), document.getElementById("dot3")];
 
-/* ── DOM refs ────────────────────────────────────────────────── */
-const step1El       = document.getElementById('step1');
-const step2El       = document.getElementById('step2');
-const emailForm     = document.getElementById('emailForm');
-const resetForm     = document.getElementById('resetForm');
-const resetEmailEl  = document.getElementById('resetEmail');
-const newPassEl     = document.getElementById('newPassword');
-const confirmPassEl = document.getElementById('confirmPassword');
-const matchHint     = document.getElementById('matchHint');
-const step2Sub      = document.getElementById('step2Sub');
-const strengthBar   = document.getElementById('strengthBar');
-const strengthLabel = document.getElementById('strengthLabel');
-const emailBtn      = document.getElementById('emailBtn');
-const resetBtn      = document.getElementById('resetBtn');
-const errorBanner1  = document.getElementById('errorBanner1');
-const errorBanner2  = document.getElementById('errorBanner2');
-const emailFieldGroup = document.getElementById('emailFieldGroup');
-const emailSentMessage = document.getElementById('emailSentMessage');
+  function showError(msg)   { errorBanner.textContent = msg; errorBanner.style.display = "block"; successBanner.style.display = "none"; }
+  function showSuccess(msg) { successBanner.textContent = msg; successBanner.style.display = "block"; errorBanner.style.display = "none"; }
+  function clearBanners()   { errorBanner.style.display = "none"; successBanner.style.display = "none"; }
+  function setLoading(btn, loading, label) { btn.disabled = loading; btn.textContent = loading ? "Please wait..." : label; }
 
-/* Holds the verified email between steps */
-let verifiedEmail = '';
-let resetToken = '';
-
-/* ── Helpers ─────────────────────────────────────────────────── */
-function showError(bannerEl, msg) {
-  bannerEl.textContent = msg;
-  bannerEl.style.display = 'block';
-  bannerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  setTimeout(() => { bannerEl.style.display = 'none'; }, 5000);
-}
-
-function getAccounts() {
-  try { return JSON.parse(localStorage.getItem('accofinder_accounts') || '[]'); }
-  catch { return []; }
-}
-
-/* ── Password Strength ───────────────────────────────────────── */
-function measureStrength(pw) {
-  let score = 0;
-  if (pw.length >= 6)  score++;
-  if (pw.length >= 10) score++;
-  if (/[A-Z]/.test(pw)) score++;
-  if (/[0-9]/.test(pw)) score++;
-  if (/[^A-Za-z0-9]/.test(pw)) score++;
-  return score; // 0-5
-}
-
-const STRENGTH_META = [
-  { label: '',          color: 'transparent',    width: '0%'   },
-  { label: 'Very weak', color: '#E8453C',        width: '20%'  },
-  { label: 'Weak',      color: '#F5A623',        width: '40%'  },
-  { label: 'Fair',      color: '#F5C623',        width: '60%'  },
-  { label: 'Strong',    color: '#1D9E75',        width: '80%'  },
-  { label: 'Very strong', color: '#0d6b50',      width: '100%' },
-];
-
-newPassEl?.addEventListener('input', () => {
-  const score = measureStrength(newPassEl.value);
-  const meta  = STRENGTH_META[score];
-  strengthBar.style.width = meta.width;
-  strengthBar.style.background = meta.color;
-  strengthLabel.textContent = meta.label;
-  strengthLabel.style.color  = meta.color;
-  checkMatch();
-});
-
-confirmPassEl?.addEventListener('input', checkMatch);
-
-function checkMatch() {
-  const ok = newPassEl.value === confirmPassEl.value;
-  matchHint.style.display = confirmPassEl.value.length > 0 && !ok ? 'block' : 'none';
-  return ok;
-}
-
-/* ── Show / Hide Password Toggles ────────────────────────────── */
-
-
-function wireEye(btnId, inputEl, iconEl) {
-  document.getElementById(btnId)?.addEventListener('click', () => {
-    const showing = inputEl.type === 'text';
-    inputEl.type = showing ? 'password' : 'text';
-
-    const iconSpan = document.getElementById(iconEl);
-    if (!iconSpan) return;
-
-    iconSpan.textContent = showing ? 'visibility_off' : 'visibility';
-  });
-}
-
-
-wireEye('toggleNew',     newPassEl,     'eyeIconNew');
-wireEye('toggleConfirm', confirmPassEl, 'eyeIconConfirm');
-
-/* ── STEP 1: Verify Email & Send Link ────────────────────────── */
-emailForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = resetEmailEl.value.trim().toLowerCase();
-
-  if (!email) {
-    showError(errorBanner1, 'Please enter your email address.');
-    return;
+  function goToStep(n) {
+    document.querySelectorAll(".step").forEach((el, i) => el.classList.toggle("active", i + 1 === n));
+    dots.forEach((d, i) => d.classList.toggle("done", i < n));
+    clearBanners();
   }
 
-  const accounts = getAccounts();
-  const match    = accounts.find(u => u.email === email);
-
-  if (!match) {
-    showError(errorBanner1, 'No account found with that email address. Please check and try again, or register a new account.');
-    return;
-  }
-
-  /* Generate a secure-looking token and save it to localStorage */
-  const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  const expiry = Date.now() + 30 * 60 * 1000; // 30 minutes
-  
-  const resetData = { email, token, expiry };
-  localStorage.setItem('accofinder_reset', JSON.stringify(resetData));
-
-  /* Construct the reset link */
-  const resetLink = `${window.location.origin}${window.location.pathname}?token=${token}`;
-
-  /* Call Python backend to send email */
-  emailBtn.textContent = 'Sending email...';
-  emailBtn.disabled = true;
-
-  try {
-    const response = await fetch('http://127.0.0.1:8000/api/send-reset-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, reset_link: resetLink })
+  document.querySelectorAll(".channel-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".channel-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedChannel = btn.dataset.channel;
     });
+  });
 
-    if (!response.ok) throw new Error('Failed to send email');
-
-    /* Show success message to user */
-    emailFieldGroup.style.display = 'none';
-    emailBtn.style.display = 'none';
-    emailSentMessage.style.display = 'block';
-  } catch (err) {
-    console.error(err);
-    showError(errorBanner1, 'Failed to send the reset email. Ensure the backend server is running.');
-    emailBtn.textContent = 'Send Reset Link';
-    emailBtn.disabled = false;
-  }
-});
-
-/* ── Check URL for Token on Load ─────────────────────────────── */
-window.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const urlToken = params.get('token');
-
-  if (urlToken) {
+  const sendCodeBtn = document.getElementById("sendCodeBtn");
+  sendCodeBtn.addEventListener("click", async () => {
+    clearBanners();
+    userEmail = document.getElementById("email").value.trim();
+    if (!userEmail) return showError("Please enter your email address.");
+    setLoading(sendCodeBtn, true, "Send code");
     try {
-      const resetData = JSON.parse(localStorage.getItem('accofinder_reset'));
-      if (resetData && resetData.token === urlToken) {
-        if (Date.now() > resetData.expiry) {
-          showError(errorBanner1, 'This reset link has expired. Please request a new one.');
-          return;
-        }
+      const res  = await fetch(`${API_URL}/auth/request-otp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, channel: selectedChannel }) });
+      const data = await res.json();
+      if (!res.ok) return showError(data.detail || "Failed to send code.");
+      document.getElementById("otpSubtitle").textContent = selectedChannel === "email" ? `We sent a 6-digit code to ${userEmail}.` : `We sent a 6-digit SMS code to your phone number.`;
+      goToStep(2);
+      document.querySelectorAll(".otp-digit")[0].focus();
+    } catch { showError("Could not connect to server."); }
+    finally  { setLoading(sendCodeBtn, false, "Send code"); }
+  });
 
-        // Token valid! Show Step 2
-        verifiedEmail = resetData.email;
-        step1El.style.display  = 'none';
-        step2El.style.display  = '';
-        step2Sub.textContent = `Setting a new password for ${verifiedEmail}`;
-        newPassEl.focus();
-      } else {
-        showError(errorBanner1, 'Invalid reset link.');
-      }
-    } catch {
-      showError(errorBanner1, 'Invalid reset link.');
-    }
-  }
-});
+  const otpDigits = Array.from(document.querySelectorAll(".otp-digit"));
+  otpDigits.forEach((input, idx) => {
+    input.addEventListener("input", (e) => { const val = e.target.value.replace(/\D/g, ""); e.target.value = val.slice(-1); if (val && idx < 5) otpDigits[idx + 1].focus(); });
+    input.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !input.value && idx > 0) otpDigits[idx - 1].focus(); });
+    input.addEventListener("paste", (e) => {
+      const pasted = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "").slice(0, 6);
+      if (pasted.length === 6) { otpDigits.forEach((d, i) => (d.value = pasted[i] || "")); otpDigits[5].focus(); e.preventDefault(); }
+    });
+  });
 
-/* ── STEP 2: Reset Password ──────────────────────────────────── */
-resetForm?.addEventListener('submit', (e) => {
-  e.preventDefault();
+  const verifyBtn = document.getElementById("verifyBtn");
+  verifyBtn.addEventListener("click", async () => {
+    clearBanners();
+    const code = otpDigits.map(d => d.value).join("");
+    if (code.length < 6) return showError("Please enter all 6 digits.");
+    setLoading(verifyBtn, true, "Verify code");
+    try {
+      const res  = await fetch(`${API_URL}/auth/verify-otp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, code, channel: selectedChannel }) });
+      const data = await res.json();
+      if (!res.ok) return showError(data.detail || "Invalid code.");
+      verifiedCode = code;
+      goToStep(3);
+      document.getElementById("newPassword").focus();
+    } catch { showError("Could not connect to server."); }
+    finally  { setLoading(verifyBtn, false, "Verify code"); }
+  });
 
-  const newPw     = newPassEl.value;
-  const confirmPw = confirmPassEl.value;
+  document.getElementById("resendLink").addEventListener("click", async () => {
+    clearBanners();
+    try {
+      const res = await fetch(`${API_URL}/auth/request-otp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, channel: selectedChannel }) });
+      const data = await res.json();
+      if (!res.ok) return showError(data.detail || "Failed to resend.");
+      showSuccess("A new code has been sent.");
+      otpDigits.forEach(d => (d.value = ""));
+      otpDigits[0].focus();
+    } catch { showError("Could not connect to server."); }
+  });
 
-  if (newPw.length < 6) {
-    showError(errorBanner2, 'Password must be at least 6 characters.');
-    return;
-  }
+  const newPassEl     = document.getElementById("newPassword");
+  const confirmPassEl = document.getElementById("confirmPassword");
+  const hintEl        = document.getElementById("passwordHint");
+  const resetBtn      = document.getElementById("resetBtn");
+  const checkPasswords = () => { const ok = newPassEl.value === confirmPassEl.value; hintEl.style.display = ok ? "none" : "block"; return ok; };
+  newPassEl.addEventListener("input", checkPasswords);
+  confirmPassEl.addEventListener("input", checkPasswords);
 
-  if (newPw !== confirmPw) {
-    showError(errorBanner2, 'Passwords do not match. Please re-enter them.');
-    confirmPassEl.focus();
-    return;
-  }
-
-  /* Update the account record */
-  const accounts = getAccounts();
-  const idx = accounts.findIndex(u => u.email === verifiedEmail);
-  if (idx === -1) {
-    showError(errorBanner2, 'Something went wrong. Please start again.');
-    return;
-  }
-
-  accounts[idx].password = newPw;
-  localStorage.setItem('accofinder_accounts', JSON.stringify(accounts));
-  localStorage.removeItem('accofinder_reset'); // clear the token
-
-  /* Success animation then redirect */
-  resetBtn.textContent = 'Password updated! Redirecting…';
-  resetBtn.disabled    = true;
-
-  setTimeout(() => {
-    window.location.href = 'login.html?reset=1';
-  }, 1000);
-});
+  resetBtn.addEventListener("click", async () => {
+    clearBanners();
+    if (!checkPasswords()) return confirmPassEl.focus();
+    if (newPassEl.value.length < 6) return showError("Password must be at least 6 characters.");
+    setLoading(resetBtn, true, "Reset password");
+    try {
+      const res  = await fetch(`${API_URL}/auth/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, code: verifiedCode, channel: selectedChannel, new_password: newPassEl.value }) });
+      const data = await res.json();
+      if (!res.ok) return showError(data.detail || "Reset failed. Please start over.");
+      window.location.href = "login.html?reset=1";
+    } catch { showError("Could not connect to server."); }
+    finally  { setLoading(resetBtn, false, "Reset password"); }
+  });
+})();

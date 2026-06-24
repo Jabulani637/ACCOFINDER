@@ -1,39 +1,12 @@
-/**
- * auth.js – shared authentication helpers (localStorage-based)
- * Include this on every protected page via:  <script src="scripts/auth.js"></script>
- */
+const API_URL = "http://127.0.0.1:8000";
+// ↑ Change this to your Render URL once deployed e.g:
+// const API_URL = "https://accofinder-api.onrender.com";
 
-const AUTH_KEY = 'accofinder_user';
-
-/** Save a user session */
-function saveSession(user) {
-  localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+function saveSession(data) {
+  localStorage.setItem("token", data.access_token);
+  localStorage.setItem("user", JSON.stringify(data.user));
 }
-
-/** Get the current logged-in user (or null) */
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem(AUTH_KEY));
-  } catch {
-    return null;
-  }
-}
-
-/** Clear the session (logout) */
-function clearSession() {
-  localStorage.removeItem(AUTH_KEY);
-}
-
-/** Guard: call on protected pages – redirects to login if not logged in */
-function requireAuth() {
-  if (!getSession()) {
-    window.location.replace('login.html');
-  }
-}
-
-/** Guard: call on auth pages – redirects to home if already logged in */
-function requireGuest() {
-  if (getSession()) {
-    window.location.replace('home.html');
-  }
-}
+function getToken() { return localStorage.getItem("token"); }
+function getUser()  { const u = localStorage.getItem("user"); return u ? JSON.parse(u) : null; }
+function logout()   { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = "login.html"; }
+function requireAuth() { if (!getToken()) window.location.href = "login.html"; }

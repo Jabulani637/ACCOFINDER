@@ -1,43 +1,36 @@
-/**
- * login.js – handles sign-in form, validates credentials from localStorage,
- *            creates session, then redirects to home.html
- */
+(() => {
+  const form        = document.getElementById("loginForm");
+  const emailEl     = document.getElementById("email");
+  const passEl      = document.getElementById("password");
+  const errorBanner = document.getElementById("errorBanner");
+  const submitBtn   = document.getElementById("submitBtn");
 
-// Redirect to home if already logged in
-requireGuest();
+  function showError(msg) { if (errorBanner) { errorBanner.textContent = msg; errorBanner.style.display = "block"; } }
+  function hideError()    { if (errorBanner) errorBanner.style.display = "none"; }
 
-const form        = document.getElementById('loginForm');
-const submitBtn   = document.getElementById('submitBtn');
-const errorBanner = document.getElementById('errorBanner');
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Logging in...";
 
-form?.addEventListener('submit', (e) => {
-  e.preventDefault();
+    try {
+      const res  = await fetch(`${API_URL}/auth/login`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: emailEl.value.trim(), password: passEl.value }),
+      });
+      const data = await res.json();
+      if (!res.ok) return showError(data.detail || "Login failed.");
 
-  const email    = document.getElementById('email').value.trim().toLowerCase();
-  const password = document.getElementById('password').value;
-
-  const accounts = JSON.parse(localStorage.getItem('accofinder_accounts') || '[]');
-  const user     = accounts.find(u => u.email === email && u.password === password);
-
-  if (!user) {
-    showError('Incorrect email or password. Please try again.');
-    return;
-  }
-
-  // Save session (omit password from session)
-  const { password: _pw, ...sessionUser } = user;
-  saveSession(sessionUser);
-
-  // Show success then redirect
-  submitBtn.textContent = 'Signing in…';
-  submitBtn.disabled = true;
-  setTimeout(() => {
-    window.location.href = 'home.html';
-  }, 800);
-});
-
-function showError(msg) {
-  errorBanner.textContent = msg;
-  errorBanner.style.display = 'block';
-  setTimeout(() => { errorBanner.style.display = 'none'; }, 4000);
-}
+      saveSession(data);
+      const role = data.user.role;
+      window.location.href = role === "admin" ? "admin.html" : role === "owner" ? "dashboard.html" : "home.html";
+    } catch {
+      showError("Could not connect to server.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Log in";
+    }
+  });
+})();
